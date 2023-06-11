@@ -10,7 +10,6 @@ from IPython import display
 from utils import CvFpsCalc
 from face_mesh.face_mesh import FaceMesh
 from iris_landmark.iris_landmark import IrisLandmark
-import matplotlib as plt
 
 
 def get_args():
