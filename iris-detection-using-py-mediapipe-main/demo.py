@@ -82,7 +82,6 @@ def main():
             # 虹彩検出
             left_iris, right_iris = detect_iris(image, iris_detector, left_eye,
                                                 right_eye)
-            print(left_iris)
             # 虹彩の外接円を計算
             left_center, left_radius = calc_min_enc_losingCircle(left_iris)
             right_center, right_radius = calc_min_enc_losingCircle(right_iris)
