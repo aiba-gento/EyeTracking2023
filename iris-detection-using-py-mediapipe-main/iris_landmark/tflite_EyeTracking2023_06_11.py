@@ -35,13 +35,17 @@ def tensor_to_list(eye_contour_, iris_, image_width, image_height, input_shape):
   eye_list = []
 
   for index in range(5):
-    iris_x = int(iris_[index * 3] * image_width / input_shape[0])
-    iris_y = int(iris_[index * 3 + 1] * image_height / input_shape[1])
+    iris_x = (iris_[index * 3]) * image_width / input_shape[0]
+    iris_y = (iris_[index * 3 + 1]) * image_height / input_shape[1]
+    iris_x = int(iris_x)
+    iris_y = int(iris_y)
     iris_list.append((iris_x, iris_y))
 
   for index_ in range(15):
-    eye_x = int(eye_contour_[index_ * 3] * image_width / input_shape[0])
-    eye_y = int(eye_contour_[index_ * 3 + 1] * image_height / input_shape[1])
+    eye_x = (eye_contour_[index_ * 3]) * image_width / input_shape[0]
+    eye_y = (eye_contour_[index_ * 3 + 1]) * image_height / input_shape[1]
+    eye_x = int(eye_x)
+    eye_y = int(eye_y)
     eye_list.append((eye_x, eye_y))
     
   return iris_list, eye_list
@@ -54,7 +58,18 @@ def calc_min_enc_losingCircle(landmark_list):
   radius = int(radius)
 
   return center, radius
+
+
+def get_iris_local(iris_center, eye_list):
   
+  center = iris_center[0] - eye_list[0][0]
+  eye_width = eye_list[8][0] - eye_list[0][0]
+  eye_point = (center - eye_width/2 ) / eye_width
+  return eye_point
+
+def get_eye_level(eye_list):
+  eye_level = eye_list[3][1] - eye_list[12][1]
+  return eye_level
 
 while True:
   # カメラキャプチャ
@@ -69,18 +84,20 @@ while True:
   
   iris_list, eye_list = tensor_to_list(eye_contour, iris, image_width, image_height, input_shape)
   
-  print(iris_list)
-  
   center, radius = calc_min_enc_losingCircle(iris_list)
-  
+
   debug_image = cv2.circle(debug_image, center, radius, (0, 255, 0), 2)
   
   for i in range(15):
     debug_image = cv2.drawMarker(debug_image, eye_list[i], (0, 255, 0))
+    debug_image = cv2.putText(debug_image, str(i), eye_list[i], cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 0), 1)
   
+  iris_point = get_iris_local(center, eye_list)
+  eye_level = get_eye_level(eye_list)
+  print("iris:" + str(iris_point) + ", eye:" + str(eye_level))
   cv2.imshow("debug_image", debug_image)
   
-  key = cv2.waitKey(1)
+  key = cv2.waitKey(5)
   if key == 27:
     break
 
