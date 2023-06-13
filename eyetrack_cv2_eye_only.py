@@ -9,7 +9,7 @@
 import numpy as np # Numpy（数値計算）
 import cv2 # OpenCV（画像処理）
 
-cap = cv2.VideoCapture("eye.mp4")  # ファイルの場所、0を引数にとればwebcamからのリアルタイム画像を扱える
+cap = cv2.VideoCapture("./eye.mp4")  # ファイルの場所、0を引数にとればwebcamからのリアルタイム画像を扱える
 
 while True:
   # フレームの読み込み

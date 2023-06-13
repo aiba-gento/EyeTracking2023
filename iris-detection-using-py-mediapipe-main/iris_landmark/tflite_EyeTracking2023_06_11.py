@@ -1,6 +1,6 @@
 ##
 # @file tflite_EyeTracking2023_06_11.py
-# @version 1
+# @version 2
 # @author Aiba Gento
 # @date 2023_06_12
 # @brief EyeTrackingをTensorFlow Liteのmediapipe-irisモデルを用いて実現するプログラム
