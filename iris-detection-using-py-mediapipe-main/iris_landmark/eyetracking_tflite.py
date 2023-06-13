@@ -8,9 +8,9 @@ class EyeTracking(object):
     #self.cap_width = 960
     #self.cap_height = 540
     # カメラ準備
-    #cap = cv2.VideoCapture(self.cap_device)
-    #cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.cap_width)
-    #cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.cap_height)
+    #self.cap = cv2.VideoCapture(self.cap_device)
+    #self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.cap_width)
+    #self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.cap_height)
     # モデルをロードする
     self.irislandmark = IrisLandmark()
     # 入力テンソルの形状
@@ -21,7 +21,7 @@ class EyeTracking(object):
     iris_list = []
     eye_list = []
     for index in range(4):
-      iris_x = (iris_[index * 3]) * image_width / input_shape[0]
+      iris_x = (iris_[index * 3]) * image_width / input_shape[0]      # x成分を抽出して入力画像の座標系へ変換
       iris_y = (iris_[index * 3 + 1]) * image_height / input_shape[1]
       iris_x = int(iris_x)
       iris_y = int(iris_y)
@@ -36,14 +36,17 @@ class EyeTracking(object):
     
     return iris_list, eye_list
   
-  # irisから中心と半径を求める
+  # irisから中心と半径を求める関数
   def calc_min_enc_losingCircle(self, landmark_list):
     center, radius = cv2.minEnclosingCircle(np.array(landmark_list))
     center = (int(center[0]), int(center[1]))
     radius = int(radius)
     return center, radius
   
-  # 視線Xを-1.0 ~ 1.0で返す関数
+  ## 視線X座標を-1.0 ~ 1.0で返す関数
+  # @param iris_center 虹彩の中心の[x,y]座標
+  # @param eye_list    目の輪郭の[x,y]座標が16個入っているndarry
+  # @param gain        目の動きをどれくらい強調するか(大きくすると値が振れやすくなる)
   def get_iris_x(self, iris_center, eye_list, gain):
     center = iris_center[0] - eye_list[0][0]
     eye_width = eye_list[6][0] - eye_list[0][0]
@@ -53,7 +56,7 @@ class EyeTracking(object):
     if eye_point < -1.0:
       eye_point = -1.0
     return eye_point
-  # 視線Yを-1.0 ~ 1.0で返す関数
+  # 視線Y座標を-1.0 ~ 1.0で返す関数
   def get_iris_y(self, iris_center, eye_list, gain):
     center = iris_center[1] - eye_list[4][1]
     eye_height = eye_list[13][1] - eye_list[4][1]
@@ -69,7 +72,13 @@ class EyeTracking(object):
     eye_level = eye_list[3][1] - eye_list[12][1]
     return eye_level
   
+  ## eyetrackingを実行
+  # @param  一つの目が含まれる画像
+  # @return 視線のX座標、視線のY座標、目の開き具合、目の輪郭の[[x,y],...]]のnbarry
   def eyetrack(self, image):
+    # ret, image = self.cap.read()
+    # if not ret:
+    #  return
     assert image is not None, "imageがNone"
     image = cv2.flip(image, 1) # 第２引数が１で上下左右反転
     
